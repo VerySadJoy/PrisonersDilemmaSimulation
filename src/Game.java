@@ -60,8 +60,6 @@ class Game {
 
     public void playAndGetResults() {
         for (int round = 1; round <= rounds; round++) {
-            Collections.shuffle(players);
-
             for (int j = 0; j < players.size(); j++) {
                 for (int k = j + 1; k < players.size(); k++) {
                     playRound(players.get(j), players.get(k), round);
