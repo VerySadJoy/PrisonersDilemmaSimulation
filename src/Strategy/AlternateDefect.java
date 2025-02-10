@@ -1,6 +1,7 @@
 package Strategy;
 
 import java.util.List;
+
 // (랜덤형, 배신형) 고집스러운 반항아, 고독한 몽상가  
 //  
 // Alternate Defect 전략은 상대의 행동에 상관없이 D → C → D → C 패턴을 무한히 반복하는 전략이다.  

@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 //  
 // 단점:  
 // - 상대가 착취 패턴을 인지하면 강한 보복을 받을 가능성이 크다.  
-// - Forgiving Tit-for-Tat처럼 상대가 배신을 용인하지 않는 전략과 만나면 협력 관계가 깨질 수 있다.  
+// - Tit-for-Tat처럼 상대가 배신을 용인하지 않는 전략과 만나면 협력 관계가 깨질 수 있다.  
 // - 완전한 배신 전략과 만나면 협력 기회가 줄어들어 효과적인 착취가 어려울 수 있다.  
 //  
 // 실제 사회에서 이 전략을 따르는 인간 유형은 "신의 손길을 가장한 기만자" 또는 "서서히 배신하는 위선자"이다.  
@@ -44,13 +44,13 @@ public class HandOfGod implements Strategy {
 
     @Override
     public boolean choose(Player self, Player opponent, List<Boolean> opponentHistory) {
-        // ✅ 값 초기화
+        // 값 초기화
         totalRounds.putIfAbsent(opponent, 0);
         opponentCooperationCount.putIfAbsent(opponent, 0);
         exploitMode.putIfAbsent(opponent, false);
         consecutiveHighCooperation.putIfAbsent(opponent, 0);
 
-        // ✅ 라운드 수 증가
+        // 라운드 수 증가
         totalRounds.put(opponent, totalRounds.get(opponent) + 1);
         int rounds = totalRounds.get(opponent);
 
@@ -67,7 +67,7 @@ public class HandOfGod implements Strategy {
         int cooperationCount = opponentCooperationCount.get(opponent);
         double cooperationRate = (double) cooperationCount / rounds;
 
-        // ✅ 착취 모드 진입 조건 개선
+        // 착취 모드 진입 조건
         if (cooperationRate >= 0.8) {
             consecutiveHighCooperation.put(opponent, consecutiveHighCooperation.get(opponent) + 1);
             if (consecutiveHighCooperation.get(opponent) >= 5) {
@@ -79,22 +79,22 @@ public class HandOfGod implements Strategy {
 
         boolean isExploiting = exploitMode.get(opponent);
 
-        // ✅ 착취 모드 적용
+        // 착취 모드 적용
         if (isExploiting) {
             return rounds % 4 != 0; // 4라운드마다 배신 (점진적 착취)
         }
 
-        // ✅ 보복형 전략 대응 (60% 이상 협력)
+        // 보복형 전략 대응 (60% 이상 협력)
         if (cooperationRate > 0.6) {
             return random.nextDouble() > 0.3; // 30% 확률로 배신
         }
 
-        // ✅ 배신자가 협력할 가능성도 테스트
+        // 배신자가 협력할 가능성도 테스트
         if (cooperationRate < 0.3) {
             return random.nextDouble() < 0.2; // 20% 확률로 협력 (상대가 협력할 가능성 테스트)
         }
 
-        // ✅ 애매한 상대(협력-배신 혼합형) 대응
+        // 애매한 상대(협력-배신 혼합형) 대응
         return !opponentHistory.get(opponentHistory.size() - 1); // 기본적으로 상대 행동을 따라감
     }
 

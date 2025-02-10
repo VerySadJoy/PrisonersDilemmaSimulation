@@ -2,6 +2,7 @@ package Strategy;
 
 import java.util.List;
 import java.util.Random;
+
 // (보복형, 협력형) 상황에 따라 유연하게 대응하는 자비로운 응징자, 신중한 분석가  
 //  
 // Dynamic Tit-for-Tat 전략은 기본적으로 Tit-for-Tat보다도 더 자비롭지만,  

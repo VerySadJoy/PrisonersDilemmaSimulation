@@ -1,6 +1,7 @@
 package Strategy;
 
 import java.util.List;
+
 // (배신형, 착취형) 냉혈한 기회주의자, 탐욕스러운 생존주의자  
 //  
 // AlwaysDefect 전략은 상대가 협력하든 배신하든, 어떤 상황에서도 항상 배신(D)만 선택하는 전략이다.  

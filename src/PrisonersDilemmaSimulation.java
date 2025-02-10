@@ -11,6 +11,7 @@ public class PrisonersDilemmaSimulation {
     private static final Map<Player, Map<Player, Integer>> allGameResults = new ConcurrentHashMap<>();
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static final List<Map<Integer, Map<Player, Integer>>> roundScoresList = Collections.synchronizedList(new ArrayList());
+
     public static void main(String[] args) {
         runSimulation(TOTAL_GAMES);
         Map<Player, Map<Integer, Double>> averageRoundScores = calculateAverageRoundScores();
@@ -27,6 +28,7 @@ public class PrisonersDilemmaSimulation {
         createPlayers();
         int availableCores = Runtime.getRuntime().availableProcessors();
         int threadPoolSize = Math.min(availableCores * 2, 100); // 최대 100개 제한
+        System.out.println("너의 코어 수: " + availableCores);
         ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
         List<Future<Game>> futures = new ArrayList<>();
 
@@ -124,24 +126,26 @@ public class PrisonersDilemmaSimulation {
         tempPlayers.add(new Player("비열한 사기꾼 히나코", new Tranquilizer())); //31위
         tempPlayers.add(new Player("멍텅구리 치히로", new Troller())); //38위
         tempPlayers.add(new Player("두 배로 응징하는 미호", new TwoTitsForTat())); //3위
-
+        tempPlayers.add(new Player("나쁜 사람 미루", new BadPerson()));
+        tempPlayers.add(new Player("좋은 사람 세리", new GoodPerson()));
+        tempPlayers.add(new Player("성향 시험자 아리스", new OpponentTester()));
         players = Collections.unmodifiableList(tempPlayers);
     }
 
     private static void displayResult(Map<Player, Map<Player, Integer>> allGameResults) {
         Map<Player, Double> avgGameScores = new HashMap<>();
 
-        System.out.println("\n=== 상대전적 ===");
+        //System.out.println("\n=== 상대전적 ===");
         for (Player p1 : allGameResults.keySet()) {
             int playerTotalScore = 0;
 
-            System.out.println(p1.getName());
+            //System.out.println(p1.getName());
 
             for (Player p2 : allGameResults.get(p1).keySet()) {
                 int score1 = allGameResults.get(p1).getOrDefault(p2, 0);
-                int score2 = allGameResults.get(p2).getOrDefault(p1, 0);
-                int scoreDifference = score1 - score2;
-                System.out.printf("  vs %-10s: %.1f%n", p2.getName(), (double)(scoreDifference) / (double)TOTAL_GAMES);
+                //int score2 = allGameResults.get(p2).getOrDefault(p1, 0);
+                //int scoreDifference = score1 - score2;
+                //System.out.printf("  vs %-10s: %.1f%n", p2.getName(), (double)(scoreDifference) / (double)TOTAL_GAMES);
 
                 playerTotalScore += score1;
             }

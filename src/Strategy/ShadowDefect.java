@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 // (착취형, 보복형) 그림자 속의 배신자, 신뢰를 시험하는 교활한 적응자  
 //  
 // ShadowDefect 전략은 초반에는 협력적인 모습을 보이지만,  
 // 상대의 협력 비율을 분석한 후 특정 시점에 예측 불가능한 방식으로 배신하는 전략이다.  
 //  
-// 이 전략의 핵심은 ‘상대가 협력적인 성향을 보일수록,  
-// 불규칙적으로 배신을 섞어 신뢰를 시험하며 착취하는 것’이다.  
+// 이 전략의 핵심은 상대가 협력적인 성향을 보일수록,  
+// 불규칙적으로 배신을 섞어 신뢰를 시험하며 착취하는 것이다.  
 //  
 // 전략의 작동 방식:  
 // - 첫 5라운드는 무조건 협력(C)하여 상대를 방심하게 만든다.  
@@ -29,7 +30,7 @@ import java.util.Random;
 // - 상대가 확률적 배신을 간파하면, 신뢰를 회복하기 어려워질 수 있다.  
 // - 완전한 배신자(Always Defect)와 만나면 초반 협력으로 인해 손해를 볼 가능성이 크다.  
 //  
-// 실제 사회에서 이 전략을 따르는 인간 유형은 "그림자 속의 배신자" 또는 "신뢰를 시험하는 교활한 적응자"이다.  
+// 실제 사회에서 이 전략을 따르는 인간 유형은 그림자 속의 배신자 또는 신뢰를 시험하는 교활한 적응자이다.  
 // 이들은 처음에는 협력적인 모습을 보이지만, 상대가 신뢰를 보이면 이를 이용하여 예상치 못한 배신을 실행한다.  
 // 상대가 신뢰를 주면 이를 시험하고, 상대가 강경한 태도를 보이면 신중하게 대응하며  
 // 최적의 순간을 찾아 변칙적인 패턴을 통해 이득을 극대화하려 한다.  
@@ -38,7 +39,7 @@ import java.util.Random;
 public class ShadowDefect implements Strategy {
     private final Map<Player, Integer> opponentCooperationCount = new HashMap<>(); // 협력 횟수 기록
     private final Map<Player, Integer> totalRounds = new HashMap<>(); // 총 경기 수 기록
-    private final Random random = new Random(); // 확률적 배신을 위한 랜덤 변수
+    private final Random random = new Random();
 
     @Override
     public boolean choose(Player self, Player opponent, List<Boolean> opponentHistory) {

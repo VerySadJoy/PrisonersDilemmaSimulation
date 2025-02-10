@@ -31,7 +31,7 @@ import java.util.Random;
 // 장기적으로 신뢰를 형성하기 어렵고, 협력 관계를 구축하기 어려운 단점이 있다.  
 
 public class RandomStrategy implements Strategy {
-    private final Random random = new Random(); // 랜덤 객체 (무작위 결정)
+    private final Random random = new Random();
 
     @Override
     public boolean choose(Player self, Player opponent, List<Boolean> opponentHistory) {

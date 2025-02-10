@@ -46,7 +46,7 @@ class Game {
         p1.addScore(p1Points);
         p2.addScore(p2Points);
 
-        // ✅ 라운드별 총점 기록 (플레이어 정보 없이 저장)
+        // 라운드별 총점 기록 (플레이어 정보 없이 저장)
         roundScores.computeIfAbsent(round, k -> new ConcurrentHashMap<>()).merge(p1, p1Points, Integer::sum);
         roundScores.computeIfAbsent(round, k -> new ConcurrentHashMap<>()).merge(p2, p2Points, Integer::sum);
         //System.out.printf("[DEBUG] Round %d -> %s: %d, %s: %d\n", round, p1.getName(), p1Points, p2.getName(), p2Points);

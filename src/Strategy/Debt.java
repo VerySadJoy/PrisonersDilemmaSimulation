@@ -1,6 +1,7 @@
 package Strategy;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
 // (보복형, 협력형) 원한을 품은 채권자, 공정한 복수자  
 //  
 // Debt 전략은 상대가 배신하면 ‘빚’으로 기록하고, 빚이 갚히기 전까지는 배신으로 응징하는 보복형 전략이다.  
