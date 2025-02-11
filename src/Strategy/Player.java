@@ -39,6 +39,11 @@ public class Player {
     public String getName() {
         return name;
     }
+
+    public boolean getMyLastHistory(Player opponent) {
+        return history.get(opponent).get(history.get(opponent).size() - 1);
+    }
+
     public Player cloneWithNewStrategy() {
         return new Player(this.name, this.strategy.cloneStrategy());  
     }
