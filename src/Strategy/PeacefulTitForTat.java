@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 // Peaceful Tit-for-Tat 전략은 일반적인 Tit-for-Tat과 유사하지만,  
 // 상대가 5번 연속으로 배신하면 한 번 협력하여 화해를 시도하는 보다 온화한 변형 전략이다.  
 //  
-// 이 전략의 핵심은 ‘기본적으로는 보복하지만,  
-// 일정 횟수 이상 상대가 배신을 지속하면 다시 협력하여 관계를 회복하려 한다’는 것이다.  
+// 이 전략의 핵심은 기본적으로는 보복하지만,  
+// 일정 횟수 이상 상대가 배신을 지속하면 다시 협력하여 관계를 회복하려 한다는 것이다.  
 //  
 // 전략의 작동 방식:  
 // - 첫 번째 라운드는 협력(C)한다.  
@@ -56,13 +56,13 @@ public class PeacefulTitForTat implements Strategy {
             consecutiveDefects.put(opponent, 0);
         }
 
-        // 🔥 만약 내가 5번 연속 배신했다면, 한 번 협력 시도
+        // 만약 내가 5번 연속 배신했다면, 한 번 협력 시도
         if (consecutiveDefects.get(opponent) >= FORGIVENESS_THRESHOLD) {
             consecutiveDefects.put(opponent, 0); // 배신 카운트 리셋
             return true; // 화해의 손길!
         }
 
-        // ✅ 기본적으로 Tit-for-Tat 방식 (상대가 협력하면 협력, 배신하면 배신)
+        // 기본적으로 Tit-for-Tat 방식 (상대가 협력하면 협력, 배신하면 배신)
         return opponentLastMove;
     }
 

@@ -11,8 +11,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 // 1) 상대와 교착 상태(Deadlock)에 빠지는 경우 이를 감지하여 해결하고  
 // 2) 상대가 지나치게 랜덤한 행동을 할 경우 강하게 보복하는 전략이다.  
 //  
-// 이 전략의 핵심은 ‘Tit-for-Tat의 기본 원칙을 따르되,  
-// 특정한 문제(예: 협력-배신 패턴 반복, 상대의 불규칙한 배신)를 해결할 수 있도록 보완하는 것’이다.  
+// 이 전략의 핵심은 Tit-for-Tat의 기본 원칙을 따르되,  
+// 특정한 문제(예: 협력-배신 패턴 반복, 상대의 불규칙한 배신)를 해결할 수 있도록 보완하는 것이다.  
 //  
 // 전략의 작동 방식:  
 // - 첫 번째 라운드는 무조건 협력(C).  
@@ -46,7 +46,6 @@ public class OmegaTitForTat implements Strategy {
 
     @Override
     public boolean choose(Player self, Player opponent, List<Boolean> opponentHistory) {
-        // 리스트를 CopyOnWriteArrayList로 관리하여 동시 수정 방지
         opponentHistories.putIfAbsent(opponent, new CopyOnWriteArrayList<>(opponentHistory));
         List<Boolean> history = opponentHistories.get(opponent);
 

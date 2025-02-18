@@ -31,7 +31,7 @@ public class TitForTatLastDefect implements Strategy {
     @Override
     public boolean choose(Player self, Player opponent, List<Boolean> opponentHistory) {
         // 마지막 라운드라면 무조건 배신(D)
-        if (self.getBattleCount() >= 499) {
+        if (opponentHistory.size() >= 499) {
             return false;
         }
 

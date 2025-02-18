@@ -61,9 +61,11 @@ public class DeceptiveAdaptation implements Strategy {
         // 제어된 랜덤성 적용
         if (coopRate > 0.8) {
             return random.nextDouble() > 0.2; // 상대가 협력 위주라면 80% 협력, 20% 배신
-        } else if (coopRate > 0.5) {
+        }
+        else if (coopRate > 0.5) {
             return random.nextDouble() > 0.4; // 상대가 보복형 전략이면 60% 협력, 40% 배신
-        } else {
+        }
+        else {
             return random.nextDouble() > 0.6; // 상대가 배신 위주라면 40% 협력, 60% 배신
         }
     }

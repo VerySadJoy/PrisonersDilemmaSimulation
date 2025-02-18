@@ -7,6 +7,7 @@ class Game {
     private final int rounds;
     private final Map<Player, Map<Player, Integer>> scoreBoard = new HashMap<>();
     private final Map<Integer, Map<Player, Integer>> roundScores = new ConcurrentHashMap<>();
+    private final Boolean NOISE = true;
 
     public Game(List<Player> players, int rounds) {
         this.players = players;
@@ -26,7 +27,14 @@ class Game {
     private void playRound(Player p1, Player p2, int round) {
         boolean move1 = p1.makeMove(p2);
         boolean move2 = p2.makeMove(p1);
-
+        if (NOISE) {
+            if (Math.random() < 0.01) {
+                move1 = !move1;
+            }
+            if (Math.random() < 0.01) {
+                move2 = !move2;
+            }
+        }
         int p1Points, p2Points;
 
         if (move1 && move2) { // (C, C)

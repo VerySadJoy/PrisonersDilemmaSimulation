@@ -173,7 +173,7 @@ public class ScoreGraph {
         renderer.setBaseToolTipGenerator(new XYToolTipGenerator() {
             @Override
             public String generateToolTip(XYDataset dataset, int series, int item) {
-                String playerName = dataset.getSeriesKey(series).toString(); // 🔥 시리즈 이름(플레이어 이름) 가져오기
+                String playerName = dataset.getSeriesKey(series).toString(); // 시리즈 이름(플레이어 이름) 가져오기
                 double x = dataset.getXValue(series, item);
                 double y = dataset.getYValue(series, item);
                 return String.format("%s: (Round: %.0f, Score: %.2f)", playerName, x, y);
@@ -182,7 +182,7 @@ public class ScoreGraph {
         chart.getXYPlot().setRenderer(renderer);
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setMouseWheelEnabled(true); // 줌 기능 활성화
-        chartPanel.setDisplayToolTips(true); // 🔥 툴팁 활성화
+        chartPanel.setDisplayToolTips(true); // 툴팁 활성화
 
         // 한글 깨짐 방지를 위한 폰트 설정
         Font font = new Font("Malgun Gothic", Font.PLAIN, 15);

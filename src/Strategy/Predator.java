@@ -9,8 +9,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 // Predator 전략은 상대가 협력적인 성향을 보이면 이를 착취하고,  
 // 보복 가능성이 높은 상대에게는 협력하는 기회주의적인 전략이다.  
 //  
-// 이 전략의 핵심은 ‘상대가 순수 협력가라면 계속 배신하여 이득을 취하고,  
-// 보복 가능성이 있는 상대에게는 조용히 협력하는 것’이다.  
+// 이 전략의 핵심은 상대가 순수 협력가라면 계속 배신하여 이득을 취하고,  
+// 보복 가능성이 있는 상대에게는 조용히 협력하는 것이다.  
 //  
 // 전략의 작동 방식:  
 // - 첫 번째 라운드는 무조건 배신(D)하여 상대의 반응을 본다.  
@@ -48,7 +48,6 @@ public class Predator implements Strategy {
             return false;
         }
 
-        // 동기화된 블록에서 안전하게 접근
         long betrayals;
         synchronized (history) {
             betrayals = history.stream().filter(b -> !b).count();

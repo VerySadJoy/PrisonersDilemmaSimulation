@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 // (랜덤형, 착취형) 충동적인 도약자, 감정적 반응형 플레이어  
 //  
 // Grasshopper 전략은 직전 라운드에서 얻은 점수를 기반으로 협력과 배신을 결정하는 변칙적인 전략이다.  
-// 전략명 ‘메뚜기(Grasshopper)’는 일정한 패턴 없이 여기저기 도약하는 듯한 랜덤성과 변덕스러움을 반영한다.  
+// 전략명 메뚜기는 일정한 패턴 없이 여기저기 도약하는 듯한 랜덤성과 변덕스러움을 반영한다.  
 //  
-// 이 전략의 핵심은 ‘단기적인 이득에 따라 즉흥적으로 반응’하는 것이다.  
+// 이 전략의 핵심은 단기적인 이득에 따라 즉흥적으로 반응하는 것이다.  
 // 특정한 장기적인 패턴 없이, 이전 라운드에서 얻은 점수를 분석하고  
 // 그 결과에 따라 협력과 배신을 결정하는 경향을 보인다.  
 //  
@@ -66,7 +66,7 @@ public class Grasshopper implements Strategy {
         return true; // 기본적으로 협력 (이론상 도달할 수 없는 경우지만 대비)
     }
 
-    // ✅ 상대 플레이어별 점수를 저장 (게임이 끝날 때 호출해야 함)
+    // 상대 플레이어별 점수를 저장 (게임이 끝날 때 호출해야 함)
     public void updateScore(Player opponent, int score) {
         lastRoundScores.put(opponent, score);
     }

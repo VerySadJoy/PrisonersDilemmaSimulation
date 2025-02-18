@@ -36,14 +36,9 @@ public class Opportunist implements Strategy {
 
         // 직전 라운드 확인 (내 행동은 리스트 마지막, 상대 행동은 리스트에서 마지막-1)
         int lastRound = opponentHistory.size() - 1;
-
         // 이전 라운드에서 나와 상대가 둘 다 협력(C)했다면 배신(D)
-        if (lastRound > 0 && opponentHistory.get(lastRound) && self.getMyLastHistory(opponent)) {
-            return false;
-        }
-
         // 그 외의 경우 모두 협력 (C)
-        return true;
+        return !(lastRound > 0 && opponentHistory.get(lastRound) && self.getMyLastHistory(opponent));
     }
 
     @Override

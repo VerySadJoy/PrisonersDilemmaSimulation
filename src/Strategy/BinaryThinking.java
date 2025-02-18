@@ -1,9 +1,6 @@
 package Strategy;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 // (보복형, 배신형) 흑백논리 신봉자, 극단적 계산가  
 //  
@@ -29,25 +26,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 // 이러한 성향은 일관성이 있지만, 융통성이 부족하고 상대에게 쉽게 간파당할 위험이 있다.  
 
 public class BinaryThinking implements Strategy {
-    private final Map<Player, List<Boolean>> opponentHistories = new ConcurrentHashMap<>(); // 안전한 기록 저장
-
     @Override
     public boolean choose(Player self, Player opponent, List<Boolean> opponentHistory) {
-        // 안전한 리스트 관리
-        opponentHistories.putIfAbsent(opponent, new CopyOnWriteArrayList<>(opponentHistory));
-        List<Boolean> history = opponentHistories.get(opponent);
-
         // 상대방의 행동 기록이 비어 있다면 (즉, 첫 라운드라면) 무조건 배신(D) 선택
-        if (history.isEmpty()) {
+        if (opponentHistory.isEmpty()) {
             return false;
         }
 
         // 동기화된 블록에서 안전하게 접근
         double cooperationRate;
-        synchronized (history) {
-            long cooperationCount = history.stream().filter(b -> b).count();
-            cooperationRate = (double) cooperationCount / history.size();
-        }
+
+        long cooperationCount = opponentHistory.stream().filter(b -> b).count();
+        cooperationRate = (double) cooperationCount / opponentHistory.size();
+        
 
         // 협력 비율이 50% 이하라면 무조건 배신(D)
         // 협력 비율이 50%를 초과하면 무조건 협력(C)

@@ -4,16 +4,17 @@ import java.util.concurrent.*;
 import javax.swing.SwingUtilities;
 
 public class PrisonersDilemmaSimulation {
-    private static final int TOTAL_GAMES = 100; // 총 반복 횟수
+    private static final int TOTAL_GAMES = 50; // 총 반복 횟수
     private static final int ROUNDS_PER_GAME = 500; // 한 게임당 라운드 수
 
     private static List<Player> players;
-    private static final Map<Player, Map<Player, Integer>> allGameResults = new ConcurrentHashMap<>();
+    private static Map<Player, Map<Player, Integer>> allGameResults = new ConcurrentHashMap<>();
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static final List<Map<Integer, Map<Player, Integer>>> roundScoresList = Collections.synchronizedList(new ArrayList());
     private static List<String> graphPlayers = new ArrayList<>();
     public static void main(String[] args) {
-        runSimulation(TOTAL_GAMES);
+        runSimulationUntilOneLeft();
+        //runSimulation(TOTAL_GAMES);
         //Map<Player, Map<Integer, Double>> averageRoundScores = calculateAverageRoundScores();
         Map<Player, Map<Integer, Double>> averageRoundScores = calculateDeltaScores();
         graphPlayers();
@@ -21,16 +22,15 @@ public class PrisonersDilemmaSimulation {
         SwingUtilities.invokeLater(() -> {
             @SuppressWarnings("unused")
             ScoreGraph graph = new ScoreGraph(averageRoundScores, ROUNDS_PER_GAME);
-            graph.displayGraphWithBestFit(new ArrayList<>());
+            //graph.displayGraphWithBestFit(new ArrayList<>());
         });
     }
 
     @SuppressWarnings("CallToPrintStackTrace")
     public static void runSimulation(int numGames) {
-        createPlayers();
         int availableCores = Runtime.getRuntime().availableProcessors();
         int threadPoolSize = Math.min(availableCores * 2, 100); // 최대 100개 제한
-        System.out.println("너의 코어 수: " + availableCores);
+        //System.out.println("너의 코어 수: " + availableCores);
         ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
         List<Future<Game>> futures = new ArrayList<>();
 
@@ -38,13 +38,14 @@ public class PrisonersDilemmaSimulation {
         for (int gameIndex = 0; gameIndex < numGames; gameIndex++) {
             final int currentGame = gameIndex;
             futures.add(executor.submit(() -> {
-                System.out.println("Game: " + currentGame + " 실행 중...");
-        
+                
+                
                 //  각 게임마다 독립적인 Player 리스트 생성 (클론 사용)
                 List<Player> clonedPlayers = players.stream()
                     .map(Player::cloneWithNewStrategy)  //  독립적인 전략을 가진 새로운 플레이어 사용
                     .toList();
-        
+                //System.out.println("Game: " + clonedPlayers.size() + " 실행 중...");
+                //test(clonedPlayers);
                 Game game = new Game(clonedPlayers, ROUNDS_PER_GAME);
                 game.playAndGetResults();
                 return game;
@@ -65,7 +66,8 @@ public class PrisonersDilemmaSimulation {
         executor.shutdown(); // 스레드 풀 종료
 
         //  최종 결과 출력
-        displayResult(allGameResults);
+        //displayResult(allGameResults);
+        
     }
 
     private static synchronized void mergeResults(Map<Player, Map<Player, Integer>> gameResults) {
@@ -93,68 +95,72 @@ public class PrisonersDilemmaSimulation {
         graphPlayers.add("순수한 협력가 카나에");
     }
 
-    private static void createPlayers() {
+    private static void createPlayers(List<Player> removeList) {
+        players = null;
         List<Player> tempPlayers = new ArrayList<>();
         tempPlayers.add(new Player("교대 협력자 하루", new AlternateCooperate()));
-        tempPlayers.add(new Player("교대 배신자 이로하", new AlternateDefect())); //35위
-        tempPlayers.add(new Player("순수한 협력가 카나에", new AlwaysCooperate())); //13위
-        tempPlayers.add(new Player("냉혈한 배신자 아카네", new AlwaysDefect())); //28위
+        tempPlayers.add(new Player("교대 배신자 이로하", new AlternateDefect()));
+        tempPlayers.add(new Player("순수한 협력가 카나에", new AlwaysCooperate()));
+        tempPlayers.add(new Player("냉혈한 배신자 아카네", new AlwaysDefect()));
         tempPlayers.add(new Player("나쁜 사람 미루", new BadPerson()));
-        tempPlayers.add(new Player("이분법자 츠바사", new BinaryThinking())); //26위
+        tempPlayers.add(new Player("이분법자 츠바사", new BinaryThinking()));
+        tempPlayers.add(new Player("사기캐 시유", new Cheater()));
         tempPlayers.add(new Player("연대책임론자 안즈", new CollectiveResponsibility()));
         tempPlayers.add(new Player("상황을 판단하려 드는 아이리스", new ConditionalCommitment()));
         tempPlayers.add(new Player("보복을 두려워하는 배신자 사라", new ConditionalForgiver()));
-        tempPlayers.add(new Player("사과할줄 아는 루나", new ContriteTitForTat())); //15위
-        tempPlayers.add(new Player("빚을 잊지 않는 아이코", new Debt())); //4위
-        tempPlayers.add(new Player("정제된 광기 히카리", new DeceptiveAdaptation())); //30위
-        tempPlayers.add(new Player("계산적인 장사꾼 이치카", new DiscountFactor())); //30위
-        tempPlayers.add(new Player("자애로운 협력가 리나", new DynamicTitForTat())); //17위
+        tempPlayers.add(new Player("사과할줄 아는 루나", new ContriteTitForTat()));
+        tempPlayers.add(new Player("빚을 잊지 않는 아이코", new Debt()));
+        tempPlayers.add(new Player("정제된 광기 히카리", new DeceptiveAdaptation()));
+        tempPlayers.add(new Player("계산적인 장사꾼 이치카", new DiscountFactor()));
+        tempPlayers.add(new Player("자애로운 협력가 리나", new DynamicTitForTat()));
         tempPlayers.add(new Player("생각하는 보복가 카즈하", new EnhancedTitForTat()));
-        tempPlayers.add(new Player("약육강식 노엘", new Flatterer())); //19위
-        tempPlayers.add(new Player("용서하는 자 모모", new ForgivingTitForTat())); //12위
-        tempPlayers.add(new Player("도박사 키리코", new Gambler())); //25위
-        tempPlayers.add(new Player("감정적인 유리멘탈 치카코", new GlassMind())); //20위
+        tempPlayers.add(new Player("약육강식 노엘", new Flatterer()));
+        tempPlayers.add(new Player("용서하는 자 모모", new ForgivingTitForTat()));
+        tempPlayers.add(new Player("도박사 키리코", new Gambler()));
+        tempPlayers.add(new Player("감정적인 유리멘탈 치카코", new GlassMind()));
         tempPlayers.add(new Player("좋은 사람 세리", new GoodPerson()));
-        tempPlayers.add(new Player("신중한 보복가 미카", new Gradual())); //7위
-        tempPlayers.add(new Player("즉흥적인 배짱이 하루카", new Grasshopper())); //29위
-        tempPlayers.add(new Player("탐욕적인 기회주의자 레이나", new GreedyTitForTat())); //39위
-        tempPlayers.add(new Player("복수의 사도 카오리", new GrimTrigger())); //8위
-        tempPlayers.add(new Player("협력 유도자 스즈메", new GuidingCooperator())); //11위
-        tempPlayers.add(new Player("철저한 분석가 나나세", new HandOfGod())); //40위 ㅠㅜ
-        tempPlayers.add(new Player("뒷끝있는 협력자 키누에", new HardTitForTat())); //2위
-        tempPlayers.add(new Player("반동분자 유리", new Merchant())); //21위
-        tempPlayers.add(new Player("진화하는 히토미", new Mutation())); //21위
-        tempPlayers.add(new Player("분탕종자 레이", new MutualDestruction())); //22위
-        tempPlayers.add(new Player("기분파 인간 아이", new NoisyTitForTat())); //22위
-        tempPlayers.add(new Player("전략적 판단가 니코", new OmegaTitForTat())); //32위
+        tempPlayers.add(new Player("신중한 보복가 미카", new Gradual()));
+        tempPlayers.add(new Player("즉흥적인 배짱이 하루카", new Grasshopper()));
+        tempPlayers.add(new Player("탐욕적인 기회주의자 레이나", new GreedyTitForTat()));
+        tempPlayers.add(new Player("복수의 사도 카오리", new GrimTrigger()));
+        tempPlayers.add(new Player("협력 유도자 스즈메", new GuidingCooperator()));
+        tempPlayers.add(new Player("철저한 분석가 나나세", new HandOfGod()));
+        tempPlayers.add(new Player("뒷끝있는 협력자 키누에", new HardTitForTat()));
+        tempPlayers.add(new Player("반동분자 유리", new Merchant()));
+        tempPlayers.add(new Player("진화하는 히토미", new Mutation()));
+        tempPlayers.add(new Player("분탕종자 레이", new MutualDestruction()));
+        tempPlayers.add(new Player("기분파 인간 아이", new NoisyTitForTat()));
+        tempPlayers.add(new Player("전략적 판단가 니코", new OmegaTitForTat()));
         tempPlayers.add(new Player("성향 시험자 아리스", new OpponentTester()));
         tempPlayers.add(new Player("교활한 인간 린", new Opportunist()));
-        tempPlayers.add(new Player("패턴 파괴자 우이", new PatternBreaker())); //23위
-        tempPlayers.add(new Player("과거를 기억하는 미나", new Pavlov())); //16위
-        tempPlayers.add(new Player("화해를 원하는 모네", new PeacefulTitForTat())); //6위
-        tempPlayers.add(new Player("영악한 착취자 아스나", new Predator())); //27위
-        tempPlayers.add(new Player("위대한 예언가 유키카", new Predictor())); //9위
-        tempPlayers.add(new Player("확률적 협력가 유즈키", new ProbabilisticTitForTat())); //14위
+        tempPlayers.add(new Player("패턴 파괴자 우이", new PatternBreaker()));
+        tempPlayers.add(new Player("과거를 기억하는 미나", new Pavlov()));
+        tempPlayers.add(new Player("화해를 원하는 모네", new PeacefulTitForTat()));
+        tempPlayers.add(new Player("영악한 착취자 아스나", new Predator()));
+        tempPlayers.add(new Player("위대한 예언가 유키카", new Predictor()));
+        tempPlayers.add(new Player("확률적 협력가 유즈키", new ProbabilisticTitForTat()));
         tempPlayers.add(new Player("최근을 더 고려하는 리츠", new ProbabilisticWeightedTitForTat()));
-        tempPlayers.add(new Player("미친 변덕쟁이 미유", new RandomStrategy())); //36위
+        tempPlayers.add(new Player("미친 변덕쟁이 미유", new RandomStrategy()));
         tempPlayers.add(new Player("의심을 거두는 아오이", new ReverseGrimTrigger()));
-        tempPlayers.add(new Player("붉은 혁명 루카리", new RobinHood())); //34위
-        tempPlayers.add(new Player("인내하는 카렌", new Saint())); //10위
-        tempPlayers.add(new Player("첫 인상만 보는 하츠네", new ScammerTester())); //24위
-        tempPlayers.add(new Player("지능형 배신자 사오리", new ShadowDefect())); //18위
-        tempPlayers.add(new Player("가차없는 코노하", new Shepherd())); //1위
+        tempPlayers.add(new Player("붉은 혁명 루카리", new RobinHood()));
+        tempPlayers.add(new Player("인내하는 카렌", new Saint()));
+        tempPlayers.add(new Player("첫 인상만 보는 하츠네", new ScammerTester()));
+        tempPlayers.add(new Player("지능형 배신자 사오리", new ShadowDefect()));
+        tempPlayers.add(new Player("가차없는 코노하", new Shepherd()));
         tempPlayers.add(new Player("선입견에 가득 찬 니카", new StereoType()));
-        tempPlayers.add(new Player("고뇌하는 협력가 마리", new SlowTitForTat())); //33위
-        tempPlayers.add(new Player("교활한 협력가 나츠키", new SuspiciousTitForTat())); //37위
-        tempPlayers.add(new Player("정석적인 인간 아야메", new TitForTat())); //5위
-        tempPlayers.add(new Player("실리주의자 사에", new TitForTatLastDefect())); //5위
-        tempPlayers.add(new Player("비열한 사기꾼 히나코", new Tranquilizer())); //31위
-        tempPlayers.add(new Player("멍텅구리 치히로", new Troller())); //38위
-        tempPlayers.add(new Player("두 배로 응징하는 미호", new TwoTitsForTat())); //3위
-        
-        
-        
-        players = Collections.unmodifiableList(tempPlayers);
+        tempPlayers.add(new Player("고뇌하는 협력가 마리", new SlowTitForTat()));
+        tempPlayers.add(new Player("교활한 협력가 나츠키", new SuspiciousTitForTat()));
+        tempPlayers.add(new Player("정석적인 인간 아야메", new TitForTat()));
+        tempPlayers.add(new Player("실리주의자 사에", new TitForTatLastDefect()));
+        tempPlayers.add(new Player("비열한 사기꾼 히나코", new Tranquilizer()));
+        tempPlayers.add(new Player("멍텅구리 치히로", new Troller()));
+        tempPlayers.add(new Player("두 배로 응징하는 미호", new TwoTitsForTat()));
+             
+        //players = Collections.unmodifiableList(tempPlayers);
+        for (Player player : removeList) {
+            tempPlayers.remove(player);
+        }
+        players = tempPlayers;
     }
 
     private static void displayResult(Map<Player, Map<Player, Integer>> allGameResults) {
@@ -168,10 +174,12 @@ public class PrisonersDilemmaSimulation {
 
             for (Player p2 : allGameResults.get(p1).keySet()) {
                 int score1 = allGameResults.get(p1).getOrDefault(p2, 0);
-                //int score2 = allGameResults.get(p2).getOrDefault(p1, 0);
-                //int scoreDifference = score1 - score2;
-                //System.out.printf("  vs %-10s: %.1f%n", p2.getName(), (double)(scoreDifference) / (double)TOTAL_GAMES);
-
+                // if (p1.getName().equals("사기캐 시유")) {
+                   
+                //     int score2 = allGameResults.get(p2).getOrDefault(p1, 0);
+                //     int scoreDifference = score1 - score2;
+                //     System.out.printf("  vs %-10s: %.1f%n", p2.getName(), (double)(scoreDifference) / (double)TOTAL_GAMES);                    
+                // }
                 playerTotalScore += score1;
             }
             avgGameScores.put(p1, playerTotalScore / (double) (TOTAL_GAMES * players.size()));
@@ -256,5 +264,88 @@ public class PrisonersDilemmaSimulation {
         // }
     
         return averageRoundScores;
-    }           
+    }
+    
+    public static void runSimulationUntilOneLeft() {
+        //createPlayers();  // 원본 players 리스트는 그대로 사용
+    
+        // 원본 players 리스트를 복사해서 수정 가능한 리스트 생성
+        List<Player> remove = new ArrayList<>();
+    
+        // ExecutorService나 멀티쓰레딩을 사용할 때, players 리스트는 항상 복사본을 사용하여 수정합니다.
+        while (remove.size() < 57) {
+            createPlayers(remove);
+            //System.out.println("현재 플레이어 수: " + players.size());
+            runSimulation(TOTAL_GAMES);
+            
+            // 마지막 플레이어 찾기
+            Player lastPlacePlayer = findLastPlacePlayer(remove);
+    
+            if (lastPlacePlayer != null) {
+                System.out.println(players.size() + "위: " + lastPlacePlayer.getName());
+                
+                // 플레이어 제거 (안전하게)
+                remove.add(lastPlacePlayer);
+                players.remove(lastPlacePlayer);
+            }
+        }
+    
+        // 최종 우승자 출력
+        if (players.size() == 1) {
+            System.out.println("최종 우승자: " + players.get(0).getName());
+        }
+    
+        // 마지막에 다시 unmodifiableList로 설정 (멀티쓰레딩 환경에서 안전하게 읽기 전용으로 설정)
+        //players = Collections.unmodifiableList(modifiablePlayers);
+    }    
+
+    private static Map<Player, Double> calculateAverageScores(List<Player> remove) {
+        Map<Player, Double> avgScores = new HashMap<>();
+    
+        for (Player player : allGameResults.keySet()) {
+            int totalScore = 0;
+    
+            for (int score : allGameResults.get(player).values()) {
+                totalScore += score;
+            }
+    
+            avgScores.put(player, totalScore / (double) TOTAL_GAMES);
+        }
+        allGameResults = new ConcurrentHashMap<>();
+        return avgScores;
+    }
+    
+    private static Player findLastPlacePlayer(List<Player> remove) {
+        Map<Player, Double> avgGameScores = calculateAverageScores(remove);
+        
+        // Find the minimum average score using a stream (no need for the variable to be mutable)
+        double minAverageScore = avgGameScores.values().stream()
+            .min(Double::compare)
+            .orElse(Double.MAX_VALUE); // Use Double.MAX_VALUE if there's no player
+    
+        // Check for ties in the minimum score
+        long numPlayersWithMinScore = avgGameScores.values().stream()
+            .filter(score -> score == minAverageScore)
+            .count();
+    
+        if (numPlayersWithMinScore > 1) {
+            return null; // No removal if there's a tie for the lowest score
+        }
+    
+        // Find the player with the minimum average score
+        for (Map.Entry<Player, Double> entry : avgGameScores.entrySet()) {
+            if (entry.getValue() == minAverageScore) {
+                return entry.getKey();
+            }
+        }
+        
+        return null;
+    }
+    private static void test(List<Player> test) {
+        for (Player player : test) {
+            if (player.getName().equals("의심을 거두는 아오이")) {
+                System.out.println("시발");
+            }
+        }
+    }
 }

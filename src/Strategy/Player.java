@@ -6,7 +6,7 @@ public class Player {
     private final String name;
     private final Strategy strategy;
     private int score = 0;
-    private int battleCount = 0;
+    private int battleCount = 1;
     private final Map<Player, List<Boolean>> history = new ConcurrentHashMap<>(); // 상대별 기록 유지
 
     public Player(String name, Strategy strategy) {
@@ -38,6 +38,10 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public Strategy getStrategy() {
+        return this.strategy;
     }
 
     public boolean getMyLastHistory(Player opponent) {

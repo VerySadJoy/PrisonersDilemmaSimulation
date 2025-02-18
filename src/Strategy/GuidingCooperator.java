@@ -45,7 +45,7 @@ public class GuidingCooperator implements Strategy {
         totalRounds.computeIfAbsent(opponent, k -> 0);
         opponentDefectionStreak.computeIfAbsent(opponent, k -> 0);
 
-        // ✅ 동기화하여 안전한 값 증가
+        // 동기화하여 안전한 값 증가
         synchronized (totalRounds) {
             totalRounds.put(opponent, totalRounds.get(opponent) + 1);
         }
@@ -57,10 +57,10 @@ public class GuidingCooperator implements Strategy {
             return true;
         }
 
-        // ✅ 안전한 상대 배신 여부 확인
+        // 안전한 상대 배신 여부 확인
         boolean lastMoveWasDefection = !opponentHistory.isEmpty() && !opponentHistory.get(opponentHistory.size() - 1);
 
-        // ✅ 동기화하여 안전한 배신 연속 기록
+        // 동기화하여 안전한 배신 연속 기록
         synchronized (opponentDefectionStreak) {
             int defectionStreak = opponentDefectionStreak.getOrDefault(opponent, 0);
             if (lastMoveWasDefection) {

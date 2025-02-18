@@ -84,7 +84,8 @@ public class Mutation implements Strategy {
             finalAction = lastOpponentMove; // 상대의 행동을 따라감
             double newValue = currentValue.get(opponent) + explorationFactor.get(opponent) * (random.nextDouble() * 2 - 1);
             currentValue.put(opponent, newValue);
-        } else {
+        }
+        else {
             // 보복: 강한 변이 (Mutation)
             finalAction = !lastOpponentMove; // 상대의 행동을 반대로 함
             double newValue = currentValue.get(opponent) + mutationRate.get(opponent) * (random.nextDouble() * 2 - 1);
@@ -108,7 +109,7 @@ public class Mutation implements Strategy {
         return objectiveFunction(x);
     }
 
-    // 최적화할 목표 함수 (예제: 단순한 이차함수 + 사인함수)
+    // 최적화할 목표 함수
     private double objectiveFunction(double x) {
         return x * x + 5 * Math.sin(x); // f(x) = x^2 + 5sin(x)
     }
