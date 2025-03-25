@@ -28,6 +28,8 @@ public class PrisonersDilemmaSimulation {
 
     @SuppressWarnings("CallToPrintStackTrace")
     public static void runSimulation(int numGames) {
+        roundScoresList.clear();
+        allGameResults.clear();
         int availableCores = Runtime.getRuntime().availableProcessors();
         int threadPoolSize = Math.min(availableCores * 2, 100); // 최대 100개 제한
         //System.out.println("너의 코어 수: " + availableCores);
@@ -63,7 +65,15 @@ public class PrisonersDilemmaSimulation {
             }
         }
 
-        executor.shutdown(); // 스레드 풀 종료
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+        }
+        // 스레드 풀 종료
 
         //  최종 결과 출력
         //displayResult(allGameResults);
@@ -157,9 +167,8 @@ public class PrisonersDilemmaSimulation {
         tempPlayers.add(new Player("두 배로 응징하는 미호", new TwoTitsForTat()));
              
         //players = Collections.unmodifiableList(tempPlayers);
-        for (Player player : removeList) {
-            tempPlayers.remove(player);
-        }
+        tempPlayers.removeAll(removeList);
+
         players = tempPlayers;
     }
 
@@ -329,6 +338,7 @@ public class PrisonersDilemmaSimulation {
             .count();
     
         if (numPlayersWithMinScore > 1) {
+            System.out.println("동률");
             return null; // No removal if there's a tie for the lowest score
         }
     
