@@ -64,5 +64,4 @@ public class Player {
     public int hashCode() {
         return Objects.hash(name);  // 이름 기반으로 해시코드 생성
     }
-
 }

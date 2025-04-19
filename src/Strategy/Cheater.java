@@ -3,11 +3,41 @@ package Strategy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+/**
+ * 전략 이름: Cheater  
+ * 전략 유형: 메타 전략, 비정상적 전지적 판단자  
+ *  
+ * 전략 개요:  
+ * - 상대의 전략 클래스명을 직접 확인하여 가장 적절한 대응을 선택  
+ * - 상대의 전략을 모른다는 기본 전제를 강제로 깨뜨린 전략  
+ * - 실제 시뮬레이션에서는 사용할 수 없지만, 재미와 분석용으로 강력한 성능을 발휘  
+ *  
+ * 작동 방식:  
+ * - 상대의 `getStrategy().getClass().getSimpleName()`을 이용해 전략명을 파악  
+ * - 전략마다 대응 패턴을 커스터마이징  
+ *   - ex) AlwaysDefect → 계속 배신, TitForTat → 팃포탯 대응, Tranquilizer → 초반 배신 등  
+ * - 배신 카운트, 라운드 추적 등을 통해 세밀한 대응 수행  
+ *  
+ * 장점:  
+ * - 이론상 거의 모든 전략에 맞춤형으로 이기기 위한 응답이 가능 
+ * - 분석 도구로 활용하면, 특정 전략의 약점을 파악할 수 있음  
+ * - 시뮬레이션에서 가장 강한 대응을 테스트해볼 수 있는 강력한 수단  
+ *  
+ * 단점:  
+ * - 상대 전략을 코드 수준에서 확인하는 건 현실적이지 않으며 공정하지 않음
+ * - 전략 자체의 사고방식이나 패턴을 반영하지 않고, 단순히 이름에 의존  
+ * - 다른 전략들과의 윤리적 협력 가능성이 거의 없음
+ *  
+ * 인간 유형 대응:  
+ * - 상대를 판단하지 않고는 시작도 못 한다는 초직관적 전략가  
+ * - 겉으로는 분석적이지만, 실상은 편견과 꼼수를 전략화한 치트성 인간  
+ * - 공정성보다 결과와 효율만을 따지는 냉정한 승부주의자
+ * - 게임의 규칙을 따르기보단, 규칙 바깥에서 방법을 찾으려는 타입
+*/
 
 public class Cheater implements Strategy {
     private final Map<Player, Integer> roundTracker = new HashMap<>(); // 상대별 라운드 카운트
     private final Map<Player, Integer> betrayalTracker = new HashMap<>();
-
     @Override
     public boolean choose(Player self, Player opponent, List<Boolean> opponentHistory) {
         roundTracker.put(opponent, roundTracker.getOrDefault(opponent, 0) + 1); // 라운드 카운트 증가

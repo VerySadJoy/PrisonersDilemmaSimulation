@@ -1,4 +1,6 @@
 import Strategy.*;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.swing.SwingUtilities;
@@ -11,13 +13,15 @@ public class PrisonersDilemmaSimulation {
     private static Map<Player, Map<Player, Integer>> allGameResults = new ConcurrentHashMap<>();
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static final List<Map<Integer, Map<Player, Integer>>> roundScoresList = Collections.synchronizedList(new ArrayList());
-    private static List<String> graphPlayers = new ArrayList<>();
+
+    private static final List<Map<Player, Double>> gameScoreHistory = new ArrayList<>();
+    private static final List<Player> allPlayers = new ArrayList<>(); // 고정된 전체 플레이어 목록
+
     public static void main(String[] args) {
         runSimulationUntilOneLeft();
-        //runSimulation(TOTAL_GAMES);
-        //Map<Player, Map<Integer, Double>> averageRoundScores = calculateAverageRoundScores();
-        Map<Player, Map<Integer, Double>> averageRoundScores = calculateDeltaScores();
-        graphPlayers();
+
+        Map<Player, Map<Integer, Double>> averageRoundScores = calculateDeltaScores(); // 또는 calculateDeltaScores();
+        exportGameScoresToCSV("round_ranks.csv");
         //  그래프 실행 (여기서 ScoreGraph 호출)
         SwingUtilities.invokeLater(() -> {
             @SuppressWarnings("unused")
@@ -25,6 +29,41 @@ public class PrisonersDilemmaSimulation {
             //graph.displayGraphWithBestFit(new ArrayList<>());
         });
     }
+    
+    @SuppressWarnings("CallToPrintStackTrace")
+    private static void exportGameScoresToCSV(String filename) {
+        try (FileWriter writer = new FileWriter(filename)) {
+            // 헤더
+            writer.write("Game");
+            for (Player p : allPlayers) {
+                writer.write("," + p.getName());
+            }
+            writer.write("\n");
+    
+            // 각 게임 기록
+            for (int gameIndex = 0; gameIndex < gameScoreHistory.size(); gameIndex++) {
+                Map<Player, Double> scoreMap = gameScoreHistory.get(gameIndex);
+                writer.write(String.valueOf(gameIndex + 1));
+    
+                for (Player p : allPlayers) {
+                    Optional<Player> matched = scoreMap.keySet().stream()
+                        .filter(player -> player.getName().equals(p.getName()))
+                        .findFirst();
+    
+                    if (matched.isPresent()) {
+                        writer.write("," + String.format("%.2f", scoreMap.get(matched.get())));
+                    } else {
+                        writer.write(",-");
+                    }
+                }
+                writer.write("\n");
+            }
+    
+            System.out.println("게임별 평균 점수 저장 완료: " + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }    
 
     @SuppressWarnings("CallToPrintStackTrace")
     public static void runSimulation(int numGames) {
@@ -32,22 +71,17 @@ public class PrisonersDilemmaSimulation {
         allGameResults.clear();
         int availableCores = Runtime.getRuntime().availableProcessors();
         int threadPoolSize = Math.min(availableCores * 2, 100); // 최대 100개 제한
-        //System.out.println("너의 코어 수: " + availableCores);
         ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
         List<Future<Game>> futures = new ArrayList<>();
 
         // 각 게임을 비동기적으로 실행
         for (int gameIndex = 0; gameIndex < numGames; gameIndex++) {
-            final int currentGame = gameIndex;
             futures.add(executor.submit(() -> {
-                
                 
                 //  각 게임마다 독립적인 Player 리스트 생성 (클론 사용)
                 List<Player> clonedPlayers = players.stream()
                     .map(Player::cloneWithNewStrategy)  //  독립적인 전략을 가진 새로운 플레이어 사용
                     .toList();
-                //System.out.println("Game: " + clonedPlayers.size() + " 실행 중...");
-                //test(clonedPlayers);
                 Game game = new Game(clonedPlayers, ROUNDS_PER_GAME);
                 game.playAndGetResults();
                 return game;
@@ -73,11 +107,6 @@ public class PrisonersDilemmaSimulation {
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
-        // 스레드 풀 종료
-
-        //  최종 결과 출력
-        //displayResult(allGameResults);
-        
     }
 
     private static synchronized void mergeResults(Map<Player, Map<Player, Integer>> gameResults) {
@@ -96,14 +125,6 @@ public class PrisonersDilemmaSimulation {
             }
         }
     }    
-    
-    private static void graphPlayers(){
-        graphPlayers.add("복수의 사도 카오리");
-        graphPlayers.add("성향 시험자 아리스");
-        graphPlayers.add("보복을 두려워하는 배신자 사라");
-        graphPlayers.add("냉혈한 배신자 아카네");
-        graphPlayers.add("순수한 협력가 카나에");
-    }
 
     private static void createPlayers(List<Player> removeList) {
         players = null;
@@ -165,30 +186,21 @@ public class PrisonersDilemmaSimulation {
         tempPlayers.add(new Player("비열한 사기꾼 히나코", new Tranquilizer()));
         tempPlayers.add(new Player("멍텅구리 치히로", new Troller()));
         tempPlayers.add(new Player("두 배로 응징하는 미호", new TwoTitsForTat()));
-             
-        //players = Collections.unmodifiableList(tempPlayers);
+        if (allPlayers.isEmpty()) {
+            allPlayers.addAll(tempPlayers);
+        }
         tempPlayers.removeAll(removeList);
-
         players = tempPlayers;
     }
 
     private static void displayResult(Map<Player, Map<Player, Integer>> allGameResults) {
         Map<Player, Double> avgGameScores = new HashMap<>();
 
-        //System.out.println("\n=== 상대전적 ===");
         for (Player p1 : allGameResults.keySet()) {
             int playerTotalScore = 0;
 
-            //System.out.println(p1.getName());
-
             for (Player p2 : allGameResults.get(p1).keySet()) {
                 int score1 = allGameResults.get(p1).getOrDefault(p2, 0);
-                // if (p1.getName().equals("사기캐 시유")) {
-                   
-                //     int score2 = allGameResults.get(p2).getOrDefault(p1, 0);
-                //     int scoreDifference = score1 - score2;
-                //     System.out.printf("  vs %-10s: %.1f%n", p2.getName(), (double)(scoreDifference) / (double)TOTAL_GAMES);                    
-                // }
                 playerTotalScore += score1;
             }
             avgGameScores.put(p1, playerTotalScore / (double) (TOTAL_GAMES * players.size()));
@@ -262,29 +274,16 @@ public class PrisonersDilemmaSimulation {
             }
         }
     
-        // //  디버깅 로그: 0번 플레이어 점수 확인
-        // Player firstPlayer = players.get(0);
-        // System.out.println("\n=== [테스트] 0번 플레이어의 평균 누적 점수 ===");
-        // System.out.printf("%-10s %-15s\n", "라운드", "누적 평균 점수");
-        // System.out.println("---------------------------------");
-    
-        // for (Integer round : new TreeSet<>(averageRoundScores.get(firstPlayer).keySet())) {
-        //     System.out.printf("%-10d %-15.2f\n", round, averageRoundScores.get(firstPlayer).get(round));
-        // }
-    
         return averageRoundScores;
     }
     
-    public static void runSimulationUntilOneLeft() {
-        //createPlayers();  // 원본 players 리스트는 그대로 사용
-    
+    public static void runSimulationUntilOneLeft() {    
         // 원본 players 리스트를 복사해서 수정 가능한 리스트 생성
         List<Player> remove = new ArrayList<>();
     
         // ExecutorService나 멀티쓰레딩을 사용할 때, players 리스트는 항상 복사본을 사용하여 수정합니다.
         while (remove.size() < 57) {
             createPlayers(remove);
-            //System.out.println("현재 플레이어 수: " + players.size());
             runSimulation(TOTAL_GAMES);
             
             // 마지막 플레이어 찾기
@@ -326,7 +325,7 @@ public class PrisonersDilemmaSimulation {
     
     private static Player findLastPlacePlayer(List<Player> remove) {
         Map<Player, Double> avgGameScores = calculateAverageScores(remove);
-        
+        gameScoreHistory.add(avgGameScores);
         // Find the minimum average score using a stream (no need for the variable to be mutable)
         double minAverageScore = avgGameScores.values().stream()
             .min(Double::compare)
