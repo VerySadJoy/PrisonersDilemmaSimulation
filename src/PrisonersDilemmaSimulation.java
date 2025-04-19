@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 
 public class PrisonersDilemmaSimulation {
     private static final int TOTAL_GAMES = 50; // 총 반복 횟수
-    private static final int ROUNDS_PER_GAME = 500; // 한 게임당 라운드 수
+    private static final int ROUNDS_PER_GAME = 100; // 한 게임당 라운드 수
 
     private static List<Player> players;
     private static Map<Player, Map<Player, Integer>> allGameResults = new ConcurrentHashMap<>();
@@ -350,12 +350,5 @@ public class PrisonersDilemmaSimulation {
         }
         
         return null;
-    }
-    private static void test(List<Player> test) {
-        for (Player player : test) {
-            if (player.getName().equals("의심을 거두는 아오이")) {
-                System.out.println("시발");
-            }
-        }
     }
 }
