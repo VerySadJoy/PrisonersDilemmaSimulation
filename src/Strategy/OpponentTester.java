@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 전략 이름: OpponentTester (a.k.a ShadowDefectV2)
+ * 전략 이름: OpponentTester
  * 전략 개요: 상대의 첫 반응을 기반으로 이후 5라운드씩 고정된 행동을 반복하는 장기적 패턴 전략
  *
  * 전략 구조:
