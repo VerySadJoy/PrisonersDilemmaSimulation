@@ -8,6 +8,7 @@ class Game {
     private final Map<Player, Map<Player, Integer>> scoreBoard = new HashMap<>();
     private final Map<Integer, Map<Player, Integer>> roundScores = new ConcurrentHashMap<>();
     private final Boolean NOISE = true;
+    private final Double NOISE_PROBABILITY = 0.01;
 
     public Game(List<Player> players, int rounds) {
         this.players = players;
@@ -28,10 +29,10 @@ class Game {
         boolean move1 = p1.makeMove(p2);
         boolean move2 = p2.makeMove(p1);
         if (NOISE) {
-            if (Math.random() < 0.01) {
+            if (Math.random() < NOISE_PROBABILITY) {
                 move1 = !move1;
             }
-            if (Math.random() < 0.01) {
+            if (Math.random() < NOISE_PROBABILITY) {
                 move2 = !move2;
             }
         }
